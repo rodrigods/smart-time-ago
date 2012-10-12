@@ -65,7 +65,7 @@ class TimeAgo
 
   timeAgoInWords: (timeString) ->
     absolutTime = @parse(timeString)
-    "#{@options.lang.prefixes.ago}#{@distanceOfTimeInWords(absolutTime)}#{@options.lang.suffix}"
+    "#{@options.lang.prefixes.ago}#{@distanceOfTimeInWords(absolutTime)}"
 
   parse: (iso8601) ->
     timeStr = $.trim(iso8601)
@@ -83,32 +83,35 @@ class TimeAgo
     #TODO support i18n.
     dim = @getTimeDistanceInMinutes(absolutTime) #distance in minutes
 
-    if dim == 0
-      "#{ @options.lang.prefixes.lt } #{ @options.lang.units.minute }"
-    else if dim == 1
-      "1 #{ @options.lang.units.minute }"
-    else if dim >= 2 and dim <= 44
-      "#{ dim } #{ @options.lang.units.minutes }"
-    else if dim >= 45 and dim <= 89
-      "#{ @options.lang.prefixes.about } 1 #{ @options.lang.units.hour }"
-    else if dim >= 90 and dim <= 1439
-      "#{ @options.lang.prefixes.about } #{ Math.round(dim / 60) } #{ @options.lang.units.hours }"
-    else if dim >= 1440 and dim <= 2519
-      "1 #{ @options.lang.units.day }"
-    else if dim >= 2520 and dim <= 43199
-      "#{ Math.round(dim / 1440) } #{ @options.lang.units.days }"
-    else if dim >= 43200 and dim <= 86399
-      "#{ @options.lang.prefixes.about } 1 #{ @options.lang.units.month }"
-    else if dim >= 86400 and dim <= 525599 #1 yr
-      "#{ Math.round(dim / 43200) } #{ @options.lang.units.months }"
-    else if dim >= 525600 and dim <= 655199 #1 yr, 3 months
-      "#{ @options.lang.prefixes.about } 1 #{ @options.lang.units.year }"
-    else if dim >= 655200 and dim <= 914399 #1 yr, 9 months
-      "#{ @options.lang.prefixes.over } 1 #{ @options.lang.units.year }"
-    else if dim >= 914400 and dim <= 1051199 #2 yr minus half minute
-      "#{ @options.lang.prefixes.almost } 2 #{ @options.lang.units.years }"
+    if dim and not isNaN(dim)
+      if dim == 0
+        "now"
+      else if dim == 1
+        "1 #{ @options.lang.units.minute }"
+      else if dim >= 2 and dim <= 44
+        "#{ dim } #{ @options.lang.units.minutes }"
+      else if dim >= 45 and dim <= 89
+        "1 #{ @options.lang.units.hour }"
+      else if dim >= 90 and dim <= 1439
+        "#{ Math.round(dim / 60) } #{ @options.lang.units.hours }"
+      else if dim >= 1440 and dim <= 2519
+        "1 #{ @options.lang.units.day }"
+      else if dim >= 2520 and dim <= 43199
+        "#{ Math.round(dim / 1440) } #{ @options.lang.units.days }"
+      else if dim >= 43200 and dim <= 86399
+        "1 #{ @options.lang.units.month }"
+      else if dim >= 86400 and dim <= 525599 #1 yr
+        "#{ Math.round(dim / 43200) } #{ @options.lang.units.months }"
+      else if dim >= 525600 and dim <= 655199 #1 yr, 3 months
+        "1 #{ @options.lang.units.year }"
+      else if dim >= 655200 and dim <= 914399 #1 yr, 9 months
+        "#{ @options.lang.prefixes.over } 1 #{ @options.lang.units.year }"
+      else if dim >= 914400 and dim <= 1051199 #2 yr minus half minute
+        "#{ @options.lang.prefixes.almost } 2 #{ @options.lang.units.years }"
+      else
+        "#{ Math.round(dim / 525600) } #{ @options.lang.units.years }"
     else
-      "#{ @options.lang.prefixes.about } #{ Math.round(dim / 525600) } #{ @options.lang.units.years }"
+      ""
 
 $.fn.timeago = (options = {}) ->
   @each ->
@@ -143,10 +146,7 @@ $.fn.timeago.defaults =
       year: "year"
       years: "years"
     prefixes:
-      lt: "less than a"
-      about: "about"
       over: "over"
       almost: "almost"
       ago: ""
-    suffix: ' ago'
 
